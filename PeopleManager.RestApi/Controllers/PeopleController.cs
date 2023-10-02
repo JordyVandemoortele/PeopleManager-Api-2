@@ -17,23 +17,23 @@ namespace PeopleManager.RestApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult Find()
+        public async Task<IActionResult> Find()
         {
-            var people = _personService.Find();
+            var people = await _personService.FindAsync();
             return Ok(people);
         }
 
         [HttpGet("{id:int}", Name = "GetPersonRoute")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get([FromRoute]int id)
         {
-            var people = _personService.Get(id);
+            var people = await _personService.GetAsync(id);
             return Ok(people);
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody]Person model)
+        public async Task<IActionResult> Create([FromBody]Person model)
         {
-            var person = _personService.Create(model);
+            var person = await _personService.CreateAsync(model);
             if (person is null)
             {
                 return NotFound();
@@ -42,9 +42,9 @@ namespace PeopleManager.RestApi.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult Edit(int id, Person model)
+        public async Task<IActionResult> Edit([FromRoute]int id, [FromBody]Person model)
         {
-            var person = _personService.Update(id, model);
+            var person = await _personService.UpdateAsync(id, model);
             if (person is null)
             {
                 return NotFound();
@@ -54,9 +54,9 @@ namespace PeopleManager.RestApi.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            _personService.Delete(id);
+            await _personService.DeleteAsync(id);
 
             return Ok();
         }

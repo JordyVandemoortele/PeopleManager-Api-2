@@ -14,34 +14,34 @@ namespace PeopleManager.Services
         }
 
         //Find
-        public IList<Vehicle> Find()
+        public async Task<IList<Vehicle>> FindAsync()
         {
-            return _dbContext.Vehicles
-                .Include(v => v.ResponsiblePerson)
-                .ToList();
+            return await _dbContext.Vehicles
+                //.Include(v => v.ResponsiblePerson)
+                .ToListAsync();
         }
 
         //Get by id
-        public Vehicle? Get(int id)
+        public async Task<Vehicle?> GetAsync(int id)
         {
-            return _dbContext.Vehicles
-                .Include(v => v.ResponsiblePerson)
-                .FirstOrDefault(v => v.Id == id);
+            return await _dbContext.Vehicles
+                //.Include(v => v.ResponsiblePerson)
+                .FirstOrDefaultAsync(v => v.Id == id);
         }
 
         //Create
-        public Vehicle? Create(Vehicle vehicle)
+        public async Task<Vehicle?> CreateAsync(Vehicle vehicle)
         {
             _dbContext.Add(vehicle);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return vehicle;
         }
 
         //Update
-        public Vehicle? Update(int id, Vehicle vehicle)
+        public async Task<Vehicle?> UpdateAsync(int id, Vehicle vehicle)
         {
-            var dbVehicle = _dbContext.Vehicles.Find(id);
+            var dbVehicle = await _dbContext.Vehicles.FindAsync(id);
             if (dbVehicle is null)
             {
                 return null;
@@ -52,13 +52,13 @@ namespace PeopleManager.Services
             dbVehicle.Type = vehicle.Type;
             dbVehicle.ResponsiblePersonId = vehicle.ResponsiblePersonId;
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return dbVehicle;
         }
 
         //Delete
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             var vehicle = new Vehicle
             {
@@ -69,7 +69,7 @@ namespace PeopleManager.Services
 
             _dbContext.Vehicles.Remove(vehicle);
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

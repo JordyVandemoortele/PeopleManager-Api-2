@@ -1,4 +1,5 @@
-﻿using PeopleManager.Core;
+﻿using Microsoft.EntityFrameworkCore;
+using PeopleManager.Core;
 using PeopleManager.Model;
 
 namespace PeopleManager.Services
@@ -13,33 +14,32 @@ namespace PeopleManager.Services
         }
 
         //Find
-        public IList<Person> Find()
+        public async Task<IList<Person>> FindAsync()
         {
-            return _dbContext.People
+            return await _dbContext.People
                 .OrderBy(p => p.FirstName)
                 .ThenBy(p => p.LastName)
-                .ToList();
+                .ToListAsync();
         }
 
         //Get by id
-        public Person? Get(int id)
+        public async Task<Person?> GetAsync(int id)
         {
-            return _dbContext.People.Find(id);
+            return await _dbContext.People.FindAsync(id);
         }
 
         //Create
-        public Person? Create(Person person)
+        public async Task<Person?> CreateAsync(Person person)
         {
             _dbContext.Add(person);
-            _dbContext.SaveChanges();
-
+            await _dbContext.SaveChangesAsync();
             return person;
         }
 
         //Update
-        public Person? Update(int id, Person person)
+        public async Task<Person?> UpdateAsync(int id, Person person)
         {
-            var dbPerson = _dbContext.People.Find(id);
+            var dbPerson = await _dbContext.People.FindAsync(id);
             if (dbPerson is null)
             {
                 return null;
@@ -50,13 +50,13 @@ namespace PeopleManager.Services
             dbPerson.Email = person.Email;
             dbPerson.Description = person.Description;
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return dbPerson;
         }
 
         //Delete
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             var person = new Person
             {
@@ -69,7 +69,7 @@ namespace PeopleManager.Services
 
             _dbContext.People.Remove(person);
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
