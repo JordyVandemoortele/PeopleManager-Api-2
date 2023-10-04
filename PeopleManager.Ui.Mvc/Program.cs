@@ -1,7 +1,17 @@
+using PeopleManager.APIservices;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpClient("PeopleManagerApi", options =>
+{
+    options.BaseAddress = new Uri("https://localhost:7134");
+});
+
+builder.Services.AddScoped<PeopleApiService>();
+builder.Services.AddScoped<VehicleApiService>();
 
 var app = builder.Build();
 

@@ -1,80 +1,75 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using PeopleManager.APIservices;
 using PeopleManager.Model;
-using PeopleManager.Services;
+using System.Net.Http;
+using System.Text;
 
 namespace PeopleManager.Ui.Mvc.Controllers
 {
     public class VehiclesController : Controller
     {
-        private readonly VehicleService _vehicleService;
-        private readonly PersonService _personService;
+        private readonly VehicleApiService _vehicleApiService;
+        private readonly PeopleApiService _peopleApiService;
 
-        public VehiclesController(VehicleService vehicleService, PersonService personService)
+        public VehiclesController(VehicleApiService vehicleApiService, PeopleApiService peopleApiService)
         {
-            _vehicleService = vehicleService;
-            _personService = personService;
-        }
-
-
-        [HttpGet]
-        public IActionResult Index()
-        {
-            var vehicles = _vehicleService.Find();
-
-            return View(vehicles);
+            _vehicleApiService = vehicleApiService;
+            _peopleApiService = peopleApiService;
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Index()
         {
-            return CreateEditView("Create");
+            var people = await _vehicleApiService.GetAll();
+            return View(people);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            return await CreateEditView("Create");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Vehicle vehicle)
+        public async Task<IActionResult> Create(Vehicle vehicle)
         {
             if (!ModelState.IsValid)
             {
-                return CreateEditView("Create", vehicle);
+                return await CreateEditView("Create", vehicle);
             }
-
-            _vehicleService.Create(vehicle);
-
+            await _vehicleApiService.Create(vehicle);
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var vehicle = _vehicleService.Get(id);
-
+            var vehicle = await _vehicleApiService.GetById(id);
             if (vehicle is null)
             {
                 return RedirectToAction("Index");
             }
-
-            return CreateEditView("Edit", vehicle);
+            return await CreateEditView("Edit", vehicle);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute]int id, [FromForm]Vehicle vehicle)
+        public async Task<IActionResult> Edit([FromRoute] int id, [FromForm] Vehicle vehicle)
         {
             if (!ModelState.IsValid)
             {
-                return CreateEditView("Edit", vehicle);
+                return View(vehicle);
             }
-
-            _vehicleService.Update(id, vehicle);
-
+            await _vehicleApiService.Edit(id, vehicle);
             return RedirectToAction("Index");
         }
-        
-        private IActionResult CreateEditView([AspMvcView]string viewName, Vehicle? vehicle = null)
+
+        private async Task<IActionResult> CreateEditView([AspMvcView] string viewName, Vehicle? vehicle = null)
         {
-            var people = _personService.Find();
+            var people = await _peopleApiService.GetAll();
 
             ViewBag.People = people;
 
@@ -82,9 +77,9 @@ namespace PeopleManager.Ui.Mvc.Controllers
         }
 
         [HttpGet]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var vehicle = _vehicleService.Get(id);
+            var vehicle = await _vehicleApiService.GetById(id);
 
             if (vehicle is null)
             {
@@ -96,10 +91,9 @@ namespace PeopleManager.Ui.Mvc.Controllers
 
         [HttpPost("Vehicles/Delete/{id:int?}")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            _vehicleService.Delete(id);
-
+            await _vehicleApiService.Delete(id);
             return RedirectToAction("Index");
         }
     }

@@ -1,23 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using PeopleManager.APIservices;
 using PeopleManager.Model;
-using PeopleManager.Services;
+using System.Text;
 
 namespace PeopleManager.Ui.Mvc.Controllers
 {
     public class PeopleController : Controller
     {
-        private readonly PersonService _personService;
+        private readonly PeopleApiService _peopleApiService;
 
-        public PeopleController(PersonService personService)
+        public PeopleController(PeopleApiService peopleApiService)
         {
-            _personService = personService;
+            _peopleApiService = peopleApiService;
         }
 
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var people = _personService.Find();
+            var people = await _peopleApiService.GetAll();
             return View(people);
         }
 
@@ -29,23 +31,21 @@ namespace PeopleManager.Ui.Mvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Person person)
+        public async Task<IActionResult> Create(Person person)
         {
             if (!ModelState.IsValid)
             {
                 return View(person);
             }
 
-            _personService.Create(person);
-
+            await _peopleApiService.Create(person);
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var person = _personService.Get(id);
-
+            var person = await _peopleApiService.GetById(id);
             if (person is null)
             {
                 return RedirectToAction("Index");
@@ -56,22 +56,20 @@ namespace PeopleManager.Ui.Mvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute]int id, [FromForm]Person person)
+        public async Task<IActionResult> Edit([FromRoute]int id, [FromForm]Person person)
         {
             if (!ModelState.IsValid)
             {
                 return View(person);
             }
-
-            _personService.Update(id, person);
-
+            await _peopleApiService.Edit(id, person);
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var person = _personService.Get(id);
+            var person = await _peopleApiService.GetById(id);
 
             if (person is null)
             {
@@ -83,10 +81,9 @@ namespace PeopleManager.Ui.Mvc.Controllers
 
         [HttpPost("People/Delete/{id:int?}")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            _personService.Delete(id);
-
+            await _peopleApiService.Delete(id);
             return RedirectToAction("Index");
         }
     }
