@@ -1,10 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using PeopleManager.APIservices;
-using PeopleManager.Model;
-using System.Net.Http;
-using System.Text;
+using PeopleManager.Dto.Requests;
 
 namespace PeopleManager.Ui.Mvc.Controllers
 {
@@ -34,7 +31,7 @@ namespace PeopleManager.Ui.Mvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Vehicle vehicle)
+        public async Task<IActionResult> Create(VehicleRequest vehicle)
         {
             if (!ModelState.IsValid)
             {
@@ -52,12 +49,19 @@ namespace PeopleManager.Ui.Mvc.Controllers
             {
                 return RedirectToAction("Index");
             }
-            return await CreateEditView("Edit", vehicle);
+            var vehicleRequest = new VehicleRequest
+            {
+                LicensePlate = vehicle.LicensePlate,
+                Brand = vehicle.Brand,
+                Type = vehicle.Type,
+                ResponsiblePersonId = vehicle.ResponsiblePersonId
+            };
+            return await CreateEditView("Edit", vehicleRequest);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([FromRoute] int id, [FromForm] Vehicle vehicle)
+        public async Task<IActionResult> Edit([FromRoute] int id, [FromForm] VehicleRequest vehicle)
         {
             if (!ModelState.IsValid)
             {
@@ -67,7 +71,7 @@ namespace PeopleManager.Ui.Mvc.Controllers
             return RedirectToAction("Index");
         }
 
-        private async Task<IActionResult> CreateEditView([AspMvcView] string viewName, Vehicle? vehicle = null)
+        private async Task<IActionResult> CreateEditView([AspMvcView] string viewName, VehicleRequest? vehicle = null)
         {
             var people = await _peopleApiService.GetAll();
 

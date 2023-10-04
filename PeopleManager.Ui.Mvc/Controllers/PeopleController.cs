@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PeopleManager.APIservices;
-using PeopleManager.Model;
+using PeopleManager.Dto.Requests;
 using System.Text;
 
 namespace PeopleManager.Ui.Mvc.Controllers
@@ -31,7 +31,7 @@ namespace PeopleManager.Ui.Mvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Person person)
+        public async Task<IActionResult> Create(PersonRequest person)
         {
             if (!ModelState.IsValid)
             {
@@ -56,7 +56,7 @@ namespace PeopleManager.Ui.Mvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([FromRoute]int id, [FromForm]Person person)
+        public async Task<IActionResult> Edit([FromRoute]int id, [FromForm] PersonRequest person)
         {
             if (!ModelState.IsValid)
             {

@@ -1,13 +1,8 @@
 ﻿using Newtonsoft.Json;
-using PeopleManager.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+using PeopleManager.Dto.Requests;
+using PeopleManager.Dto.Results;
 using System.Net.Http.Json;
 using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace PeopleManager.APIservices
 {
@@ -19,29 +14,29 @@ namespace PeopleManager.APIservices
         {
             _httpClientFactory = httpClientFactory;
         }
-        public async Task<IList<Vehicle>> GetAll()
+        public async Task<IList<VehicleResult>> GetAll()
         {
             var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
             var route = "/api/Vehicle";
             var response = await HttpClient.GetAsync(route);
             response.EnsureSuccessStatusCode();
-            var people = await response.Content.ReadFromJsonAsync<IList<Vehicle>>();
-            return people ?? new List<Vehicle>();
+            var people = await response.Content.ReadFromJsonAsync<IList<VehicleResult>>();
+            return people ?? new List<VehicleResult>();
         }
-        public async Task<Vehicle> GetById(int id)
+        public async Task<VehicleResult> GetById(int id)
         {
             var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
             var route = "/api/Vehicle/" + id;
             var response = await HttpClient.GetAsync(route);
             response.EnsureSuccessStatusCode();
-            var vehicle = await response.Content.ReadFromJsonAsync<Vehicle>();
+            var vehicle = await response.Content.ReadFromJsonAsync<VehicleResult>();
             if(vehicle == null)
             {
-                return new Vehicle { LicensePlate = ""};
+                return new VehicleResult { LicensePlate = ""};
             }
             return vehicle;
         }
-        public async Task Create (Vehicle vehicle)
+        public async Task Create (VehicleRequest vehicle)
         {
             var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
             var route = "/api/Vehicle";
@@ -49,7 +44,7 @@ namespace PeopleManager.APIservices
             var response = await HttpClient.PostAsync(route, content);
             response.EnsureSuccessStatusCode();
         }
-        public async Task Edit(int id, Vehicle vehicle)
+        public async Task Edit(int id, VehicleRequest vehicle)
         {
             var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
             var route = "/api/Vehicle/" + id;

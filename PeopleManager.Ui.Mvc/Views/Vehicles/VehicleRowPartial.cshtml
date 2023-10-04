@@ -1,13 +1,13 @@
-﻿@model Vehicle
+﻿@model VehicleResult
 
 <tr>
     <td>@Model.LicensePlate</td>
     <td>@Model.Brand</td>
     <td>@Model.Type</td>
     <td>
-        @if (Model.ResponsiblePerson is not null)
+        @if (Model.ResponsiblePersonId.HasValue)
         {
-            @: @Model.ResponsiblePerson.FirstName @Model.ResponsiblePerson.LastName
+            @: @Model.ResponsiblePersonFirstName @Model.ResponsiblePersonLastName
         }
     </td>
     <td>

@@ -1,12 +1,6 @@
-﻿using PeopleManager.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using System.Net.Http.Json;
+using PeopleManager.Dto.Requests;
+using PeopleManager.Dto.Results;
 
 namespace PeopleManager.APIservices
 {
@@ -19,42 +13,40 @@ namespace PeopleManager.APIservices
         {
             _httpClientFactory = httpClientFactory;
         }
-        public async Task<IList<Person>> GetAll()
+        public async Task<IList<PersonResult>> GetAll()
         {
             var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
             var route = "/api/People";
             var response = await HttpClient.GetAsync(route);
             response.EnsureSuccessStatusCode();
-            var people = await response.Content.ReadFromJsonAsync<IList<Person>>();
-            return people ?? new List<Person>();
+            var people = await response.Content.ReadFromJsonAsync<IList<PersonResult>>();
+            return people ?? new List<PersonResult>();
         }
-        public async Task<Person> GetById(int id)
+        public async Task<PersonResult> GetById(int id)
         {
             var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
             var route = "/api/People/" + id;
             var response = await HttpClient.GetAsync(route);
             response.EnsureSuccessStatusCode();
-            var person = await response.Content.ReadFromJsonAsync<Person>();
+            var person = await response.Content.ReadFromJsonAsync<PersonResult>();
             if (person == null)
             {
-                return new Person { Email="", FirstName="", LastName=""};
+                return new PersonResult { Email="", FirstName="", LastName=""};
             }
             return person;
         }
-        public async Task Create(Person person)
+        public async Task Create(PersonRequest person)
         {
             var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
             var route = "/api/People";
-            var content = new StringContent(JsonConvert.SerializeObject(person), Encoding.UTF8, "application/json");
-            var response = await HttpClient.PostAsync(route, content);
+            var response = await HttpClient.PostAsJsonAsync(route, person);
             response.EnsureSuccessStatusCode();
         }
-        public async Task Edit(int id, Person person)
+        public async Task Edit(int id, PersonRequest person)
         {
             var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
             var route = "/api/People/" + id;
-            var content = new StringContent(JsonConvert.SerializeObject(person), Encoding.UTF8, "application/json");
-            var response = await HttpClient.PutAsync(route, content);
+            var response = await HttpClient.PutAsJsonAsync(route, person);
             response.EnsureSuccessStatusCode();
         }
         public async Task Delete(int id)

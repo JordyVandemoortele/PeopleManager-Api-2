@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PeopleManager.Model;
+using PeopleManager.APIservices;
 using PeopleManager.Ui.Mvc.Models;
 using System.Diagnostics;
 using System.Net.Http;
@@ -8,21 +8,16 @@ namespace PeopleManager.Ui.Mvc.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly PeopleApiService _peopleApiService;
 
-        public HomeController(IHttpClientFactory httpClientFactory)
+        public HomeController(PeopleApiService peopleApiService)
         {
-            _httpClientFactory = httpClientFactory;
+            _peopleApiService = peopleApiService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
-            var route = "/api/People";
-            var response = await HttpClient.GetAsync(route);
-            response.EnsureSuccessStatusCode();
-            var people = await response.Content.ReadFromJsonAsync<IList<Person>>();
-            return View(people);
+            return View(await _peopleApiService.GetAll());
         }
 
         [HttpGet]
@@ -41,11 +36,7 @@ namespace PeopleManager.Ui.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> Detail(int id)
         {
-            var HttpClient = _httpClientFactory.CreateClient("PeopleManagerApi");
-            var route = "/api/People/" + id;
-            var response = await HttpClient.GetAsync(route);
-            response.EnsureSuccessStatusCode();
-            var person = await response.Content.ReadFromJsonAsync<Person>(); ;
+            var person = _peopleApiService.GetById(id);
 
             if (person is null)
             {
